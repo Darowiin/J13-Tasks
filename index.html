@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/tasks.js"></script>
     <title>Список задач</title>
 </head>
 <body>
@@ -18,8 +19,7 @@
                 <span class="plus-icon">+</span> Добавить задачу
             </button>
 
-            <div class="task-list">
-                </div>
+            <div class="task-list"></div>
         </div>
 
         <div class="column" id="in-progress-tasks-column">
@@ -44,9 +44,29 @@
             <button class="add-task-btn">
                 <span class="plus-icon">+</span> Добавить задачу
             </button>
-            
+
             <div class="task-list"></div>
         </div>
     </div>
+
+    <template id="task-template">
+        <div class="task priority-low" draggable="true">
+            <div class="task-content">Текст задачи</div>
+            
+            <div class="task-actions">
+                <button class="task-menu-btn">⋮</button>
+                
+                <div class="task-dropdown hidden">
+                    <button class="dropdown-item priority-btn">Приоритет: Низкий</button>
+
+                    <hr style="margin: 5px 0; border: none; border-top: 1px solid var(--column-border);">
+
+                    <button class="dropdown-item done-btn">Отметить выполненной</button>
+                    <button class="dropdown-item copy-btn">Копировать</button>
+                    <button class="dropdown-item delete-btn">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </template>
 </body>
 </html>
