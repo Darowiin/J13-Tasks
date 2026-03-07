@@ -103,3 +103,21 @@ button {
     cursor: pointer;
     font-family: inherit;
 }
+
+.status-btn {
+    display: none;
+}
+
+#do .start-btn,
+#do .done-btn {
+    display: block;
+}
+
+#in-progress .postpone-btn,
+#in-progress .done-btn {
+    display: block;
+}
+
+#done .start-btn {
+    display: block;
+}

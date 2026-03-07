@@ -9,7 +9,7 @@
 </head>
 <body>
     <div id="task-container">
-        <div class="column" id="do-tasks-column">
+        <div class="column" id="do">
             <div class="column-header">
                 <h2>Сделать <span class="counter">0</span></h2> 
                 <button class="more-options">⋮</button> 
@@ -22,7 +22,7 @@
             <div class="task-list"></div>
         </div>
 
-        <div class="column" id="in-progress-tasks-column">
+        <div class="column" id="in-progress">
             <div class="column-header">
                 <h2>В работе <span class="counter">0</span></h2> 
                 <button class="more-options">⋮</button> 
@@ -35,7 +35,7 @@
             <div class="task-list"></div>
         </div>
 
-        <div class="column" id="done-tasks-column">
+        <div class="column" id="done">
             <div class="column-header">
                 <h2>Готово <span class="counter">0</span></h2>
                 <button class="more-options">⋮</button>
@@ -50,18 +50,21 @@
     </div>
 
     <template id="task-template">
-        <div class="task priority-low" draggable="true">
+        <div class="task" draggable="true">
             <div class="task-content">Текст задачи</div>
-            
+
             <div class="task-actions">
                 <button class="task-menu-btn">⋮</button>
-                
+
                 <div class="task-dropdown hidden">
                     <button class="dropdown-item priority-btn">Приоритет: Низкий</button>
 
                     <hr style="margin: 5px 0; border: none; border-top: 1px solid var(--column-border);">
-
-                    <button class="dropdown-item done-btn">Отметить выполненной</button>
+                    
+                    <button class="dropdown-item status-btn start-btn">Начать выполнение</button>
+                    <button class="dropdown-item status-btn postpone-btn">Отложить выполнение</button>
+                    <button class="dropdown-item status-btn done-btn">Отметить выполнение</button>
+                    
                     <button class="dropdown-item copy-btn">Копировать</button>
                     <button class="dropdown-item delete-btn">Удалить</button>
                 </div>

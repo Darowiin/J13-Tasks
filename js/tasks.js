@@ -12,6 +12,10 @@ function addTask(columnId, taskText) {
     const dropdown = taskElement.querySelector('.task-dropdown');
     const deleteBtn = taskElement.querySelector('.delete-btn');
 
+    const startBtn = dropdown.querySelector('.start-btn');
+    const postponeBtn = dropdown.querySelector('.postpone-btn');
+    const doneBtn = dropdown.querySelector('.done-btn');
+
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         
@@ -22,6 +26,24 @@ function addTask(columnId, taskText) {
         });
         
         dropdown.classList.toggle('hidden');
+    });
+
+    startBtn.addEventListener('click', () => {
+        const inProgressColumn = document.getElementById('in-progress');
+        inProgressColumn.querySelector('.task-list').appendChild(taskElement);
+        dropdown.classList.add('hidden');
+    });
+
+    postponeBtn.addEventListener('click', () => {
+        const doColumn = document.getElementById('do');
+        doColumn.querySelector('.task-list').appendChild(taskElement);
+        dropdown.classList.add('hidden');
+    });
+
+    doneBtn.addEventListener('click', () => {
+        const doneColumn = document.getElementById('done');
+        doneColumn.querySelector('.task-list').appendChild(taskElement);
+        dropdown.classList.add('hidden');
     });
 
     deleteBtn.addEventListener('click', () => {
