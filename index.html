@@ -3,9 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
     <title>Список задач</title>
 </head>
 <body>
-    
+    <div id="task-container">
+        <div class="column" id="do-tasks-column">
+            <div class="column-header">
+                <h2>Сделать <span class="counter">0</span></h2> 
+                <button class="more-options">⋮</button> 
+            </div>
+
+            <button class="add-task-btn">
+                <span class="plus-icon">+</span> Добавить задачу
+            </button>
+
+            <div class="task-list">
+                </div>
+        </div>
+
+        <div class="column" id="in-progress-tasks-column">
+            <div class="column-header">
+                <h2>В работе <span class="counter">0</span></h2> 
+                <button class="more-options">⋮</button> 
+            </div>
+
+            <button class="add-task-btn">
+                <span class="plus-icon">+</span> Добавить задачу
+            </button>
+
+            <div class="task-list"></div>
+        </div>
+
+        <div class="column" id="done-tasks-column">
+            <div class="column-header">
+                <h2>Готово <span class="counter">0</span></h2>
+                <button class="more-options">⋮</button>
+            </div>
+
+            <button class="add-task-btn">
+                <span class="plus-icon">+</span> Добавить задачу
+            </button>
+            
+            <div class="task-list"></div>
+        </div>
+    </div>
 </body>
 </html>
