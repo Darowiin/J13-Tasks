@@ -12,6 +12,8 @@ function addTask(columnId, taskText) {
 
     const menuBtn = taskElement.querySelector('.task-menu-btn');
     const dropdown = taskElement.querySelector('.task-dropdown');
+    const editBtn = taskElement.querySelector('.edit-btn');
+    const copyBtn = taskElement.querySelector('.copy-btn');
     const deleteBtn = taskElement.querySelector('.delete-btn');
 
     const startBtn = dropdown.querySelector('.start-btn');
@@ -33,6 +35,7 @@ function addTask(columnId, taskText) {
     startBtn.addEventListener('click', () => {
         const inProgressColumn = document.getElementById('in-progress');
         inProgressColumn.querySelector('.task-list').appendChild(taskElement);
+
         dropdown.classList.add('hidden');
         updateCounters();
     });
@@ -40,6 +43,7 @@ function addTask(columnId, taskText) {
     postponeBtn.addEventListener('click', () => {
         const doColumn = document.getElementById('do');
         doColumn.querySelector('.task-list').appendChild(taskElement);
+
         dropdown.classList.add('hidden');
         updateCounters();
     });
@@ -47,6 +51,7 @@ function addTask(columnId, taskText) {
     doneBtn.addEventListener('click', () => {
         const doneColumn = document.getElementById('done');
         doneColumn.querySelector('.task-list').appendChild(taskElement);
+
         dropdown.classList.add('hidden');
         updateCounters();
     });
@@ -54,8 +59,21 @@ function addTask(columnId, taskText) {
     deleteBtn.addEventListener('click', () => {
         if (confirm('Точно удалить эту задачу?')) {
             taskElement.remove();
+            
             updateCounters();
         }
+    });
+    
+    editBtn.addEventListener('click', () => {
+        taskContent.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
+        dropdown.classList.add('hidden');
+    });
+
+    copyBtn.addEventListener('click', () => {
+        const currentColumnId = taskElement.closest('.column').id;
+        addTask(currentColumnId, taskContent.textContent + ' (копия)');
+
+        dropdown.classList.add('hidden');
     });
 
     taskElement.addEventListener('dragstart', () => {
@@ -67,6 +85,52 @@ function addTask(columnId, taskText) {
         draggingTask = null;
         taskElement.classList.remove('dragging');
         updateCounters();
+    });
+
+    taskContent.addEventListener('dblclick', function() {
+        this.style.display = 'none';
+
+        const editInput = document.createElement('input');
+        editInput.type = 'text';
+        editInput.value = this.textContent;
+        editInput.className = 'task-input';
+
+        this.parentNode.insertBefore(editInput, this.nextSibling);
+        editInput.focus();
+
+        let isEditing = false;
+
+        const finishEdit = () => {
+            if (isEditing) return;
+            isEditing = true;
+
+            const newText = editInput.value.trim();
+            
+            if (newText !== '') {
+                this.textContent = newText;
+            }
+            
+            editInput.remove();
+            this.style.display = ''; 
+        };
+
+        editInput.addEventListener('blur', () => {
+            if (!document.hasFocus()) return;
+            finishEdit();
+        });
+
+        editInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                finishEdit();
+            }
+            if (e.key === 'Escape') {
+                if (isEditing) return;
+                isEditing = true;
+                
+                editInput.remove();
+                this.style.display = '';
+            }
+        });
     });
 
     taskList.appendChild(taskElement);
@@ -115,11 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             input.type = 'text';
             input.placeholder = 'Что нужно сделать?';
             input.className = 'task-input';
-            
-            input.style.width = '100%';
-            input.style.padding = '8px';
-            input.style.boxSizing = 'border-box';
-            input.style.marginBottom = '10px';
 
             this.parentNode.insertBefore(input, this.nextSibling);
             input.focus();
