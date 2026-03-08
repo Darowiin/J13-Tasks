@@ -34,23 +34,27 @@ function addTask(columnId, taskText) {
         const inProgressColumn = document.getElementById('in-progress');
         inProgressColumn.querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
+        updateCounters();
     });
 
     postponeBtn.addEventListener('click', () => {
         const doColumn = document.getElementById('do');
         doColumn.querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
+        updateCounters();
     });
 
     doneBtn.addEventListener('click', () => {
         const doneColumn = document.getElementById('done');
         doneColumn.querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
+        updateCounters();
     });
 
     deleteBtn.addEventListener('click', () => {
         if (confirm('Точно удалить эту задачу?')) {
             taskElement.remove();
+            updateCounters();
         }
     });
 
@@ -62,9 +66,11 @@ function addTask(columnId, taskText) {
     taskElement.addEventListener('dragend', () => {
         draggingTask = null;
         taskElement.classList.remove('dragging');
+        updateCounters();
     });
 
     taskList.appendChild(taskElement);
+    updateCounters();
 }
 
 function getDragAfterElement(container, y) {
@@ -80,6 +86,14 @@ function getDragAfterElement(container, y) {
             return closest;
         }
     }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function updateCounters() {
+    document.querySelectorAll('.column').forEach(column => {
+        const counter = column.querySelector('.counter');
+        const taskCount = column.querySelectorAll('.task').length;
+        counter.textContent = taskCount;
+    });
 }
 
 document.addEventListener('click', () => {
