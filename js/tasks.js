@@ -1,3 +1,5 @@
+let draggingTask = null;
+
 function addTask(columnId, taskText) {
     const column = document.getElementById(columnId);
     const taskList = column.querySelector('.task-list');
@@ -52,7 +54,32 @@ function addTask(columnId, taskText) {
         }
     });
 
+    taskElement.addEventListener('dragstart', () => {
+        draggingTask = taskElement;
+        taskElement.classList.add('dragging');
+    });
+
+    taskElement.addEventListener('dragend', () => {
+        draggingTask = null;
+        taskElement.classList.remove('dragging');
+    });
+
     taskList.appendChild(taskElement);
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
 document.addEventListener('click', () => {
@@ -118,6 +145,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     button.style.display = '';
                 }
             });
+        });
+    });
+
+    const lists = document.querySelectorAll('.task-list');
+
+    lists.forEach(list => {
+        list.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            
+            const afterElement = getDragAfterElement(list, e.clientY);
+            if (afterElement == null) {
+                list.appendChild(draggingTask);
+            } else {
+                list.insertBefore(draggingTask, afterElement);
+            }
         });
     });
 });
