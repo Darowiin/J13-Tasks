@@ -1,5 +1,56 @@
 let draggingTask = null;
 
+function saveToLocalStorage() {
+    const data = {};
+    
+    document.querySelectorAll('.column').forEach(column => {
+        const columnId = column.id;
+        const sortOrder = column.dataset.sortOrder || 'none';
+        const tasks = [];
+        
+        column.querySelectorAll('.task').forEach(task => {
+            let pIndex = 0;
+            if (task.classList.contains('priority-medium')) pIndex = 1;
+            if (task.classList.contains('priority-high')) pIndex = 2;
+
+            tasks.push({
+                text: task.querySelector('.task-content').textContent,
+                priorityIndex: pIndex
+            });
+        });
+
+        data[columnId] = {
+            tasks: tasks,
+            sortOrder: sortOrder
+        };
+    });
+
+    localStorage.setItem('tasks', JSON.stringify(data));
+}
+
+function loadFromLocalStorage() {
+    const rawData = localStorage.getItem('tasks');
+    if (!rawData) return;
+
+    const data = JSON.parse(rawData);
+
+    Object.keys(data).forEach(columnId => {
+        const columnData = data[columnId];
+        const column = document.getElementById(columnId);
+        
+        column.dataset.sortOrder = columnData.sortOrder;
+        const sortBtn = column.querySelector('.sort-btn');
+        if (columnData.sortOrder === 'desc') sortBtn.textContent = 'Сортировка: сначала неважные';
+        if (columnData.sortOrder === 'asc') sortBtn.textContent = 'Сортировка: сначала важные';
+
+        columnData.tasks.forEach(task => {
+            addTask(columnId, task.text, task.priorityIndex, false);
+        });
+    });
+    
+    updateCounters();
+}
+
 function updateCounters() {
     document.querySelectorAll('.column').forEach(column => {
         const counter = column.querySelector('.counter');
@@ -46,7 +97,7 @@ document.addEventListener('click', () => {
     });
 });
 
-function addTask(columnId, taskText, initialPriorityIndex = 0) {
+function addTask(columnId, taskText, initialPriorityIndex = 0, shouldSave = true) {
     const column = document.getElementById(columnId);
     const taskList = column.querySelector('.task-list');
 
@@ -55,6 +106,8 @@ function addTask(columnId, taskText, initialPriorityIndex = 0) {
     taskList.appendChild(taskElement);
     updateCounters();
     sortColumn(column);
+    
+    if (shouldSave) saveToLocalStorage();
 }
 
 function createTaskElement(taskText, priorityIndex) {
@@ -100,6 +153,9 @@ function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityInd
         currentPriorityIndex = (currentPriorityIndex + 1) % priorities.length;
         taskElement.classList.add(priorities[currentPriorityIndex].class);
         priorityBtn.textContent = priorities[currentPriorityIndex].text;
+
+        sortColumn(taskElement.closest('.column'));
+        saveToLocalStorage();
     });
 
     menuBtn.addEventListener('click', (e) => {
@@ -112,32 +168,26 @@ function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityInd
         dropdown.classList.toggle('hidden');
     });
 
-    startBtn.addEventListener('click', () => {
-        document.getElementById('in-progress').querySelector('.task-list').appendChild(taskElement);
+    const moveTask = (targetId) => {
+        const targetColumn = document.getElementById(targetId);
+        targetColumn.querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
         updateCounters();
-        sortColumn(column);
-    });
+        sortColumn(targetColumn);
+        saveToLocalStorage();
+    };
 
-    postponeBtn.addEventListener('click', () => {
-        document.getElementById('do').querySelector('.task-list').appendChild(taskElement);
-        dropdown.classList.add('hidden');
-        updateCounters();
-        sortColumn(column);
-    });
-
-    doneBtn.addEventListener('click', () => {
-        document.getElementById('done').querySelector('.task-list').appendChild(taskElement);
-        dropdown.classList.add('hidden');
-        updateCounters();
-        sortColumn(column);
-    });
+    startBtn.addEventListener('click', () => moveTask('in-progress'));
+    postponeBtn.addEventListener('click', () => moveTask('do'));
+    doneBtn.addEventListener('click', () => moveTask('done'));
 
     deleteBtn.addEventListener('click', () => {
         if (confirm('Точно удалить эту задачу?')) {
             taskElement.remove();
             
             updateCounters();
+
+            saveToLocalStorage();
         }
     });
     
@@ -164,6 +214,8 @@ function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityInd
 
         const currentColumn = taskElement.closest('.column');
         if (currentColumn) sortColumn(currentColumn);
+        
+        saveToLocalStorage();
     });
 
     taskContent.addEventListener('dblclick', function() {
@@ -313,6 +365,8 @@ function initColumnMenus() {
                 if (confirm(`Точно удалить все задачи из колонки "${column.querySelector('h2').childNodes[0].textContent.trim()}"?`)) {
                     taskList.innerHTML = '';
                     updateCounters();
+
+                    saveToLocalStorage();
                 }
             }
             
@@ -340,6 +394,7 @@ function initSortButtons() {
             }
 
             sortColumn(column);
+            saveToLocalStorage();
         });
     });
 }
@@ -349,4 +404,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initDragAndDropZones();
     initColumnMenus();
     initSortButtons();
+
+    loadFromLocalStorage();
 });
