@@ -400,6 +400,7 @@ function initSortButtons() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    initThemeToggle();
     initAddButtons();
     initDragAndDropZones();
     initColumnMenus();
@@ -407,3 +408,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadFromLocalStorage();
 });
+
+function initThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    
+    document.body.classList.toggle('dark-theme', savedTheme === 'dark');
+    updateThemeIcon(savedTheme === 'dark');
+    
+    themeToggle.addEventListener('click', () => {
+        const isDarkTheme = document.body.classList.toggle('dark-theme');
+        const theme = isDarkTheme ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+        updateThemeIcon(isDarkTheme);
+    });
+}
+
+function updateThemeIcon(isDarkTheme) {
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.innerHTML = isDarkTheme 
+        ? '<i class="fas fa-sun"></i>' 
+        : '<i class="fas fa-moon"></i>';
+}

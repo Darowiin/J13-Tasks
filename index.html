@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/tasks.js"></script>
     <title>Список задач</title>
 </head>
 <body>
+    <div class="theme-toggle-container">
+        <button class="theme-toggle" id="themeToggle" title="Переключить тему">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
     <div id="task-container">
         <div class="column" id="do">
             <div class="column-header">
                 <h2>Сделать <span class="counter">0</span></h2> 
                 
                 <div class="column-actions">
-                    <button class="more-options">⋮</button>
+                    <button class="more-options" title="Параметры колонки">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
                     
                     <div class="column-dropdown hidden">
-                        <button class="dropdown-item sort-btn">Сортировать по приоритету</button>
-                        <button class="dropdown-item clear-column-btn delete-btn">Очистить колонку</button>
+                        <button class="dropdown-item sort-btn"><i class="fas fa-sort"></i> Сортировать по приоритету</button>
+                        <button class="dropdown-item clear-column-btn delete-btn"><i class="fas fa-trash"></i> Очистить колонку</button>
                     </div>
                 </div>
             </div>
 
             <button class="add-task-btn">
-                <span class="plus-icon">+</span> Добавить задачу
+                <i class="fas fa-plus"></i> Добавить задачу
             </button>
 
             <div class="task-list"></div>
@@ -35,17 +43,19 @@
                 <h2>В работе <span class="counter">0</span></h2> 
                 
                 <div class="column-actions">
-                    <button class="more-options">⋮</button>
+                    <button class="more-options" title="Параметры колонки">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
                     
                     <div class="column-dropdown hidden">
-                        <button class="dropdown-item sort-btn">Сортировать по приоритету</button>
-                        <button class="dropdown-item clear-column-btn delete-btn">Очистить колонку</button>
+                        <button class="dropdown-item sort-btn"><i class="fas fa-sort"></i> Сортировать по приоритету</button>
+                        <button class="dropdown-item clear-column-btn delete-btn"><i class="fas fa-trash"></i> Очистить колонку</button>
                     </div>
                 </div>
             </div>
 
             <button class="add-task-btn">
-                <span class="plus-icon">+</span> Добавить задачу
+                <i class="fas fa-plus"></i> Добавить задачу
             </button>
 
             <div class="task-list"></div>
@@ -56,17 +66,19 @@
                 <h2>Готово <span class="counter">0</span></h2> 
                 
                 <div class="column-actions">
-                    <button class="more-options">⋮</button>
+                    <button class="more-options" title="Параметры колонки">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
                     
                     <div class="column-dropdown hidden">
-                        <button class="dropdown-item sort-btn">Сортировать по приоритету</button>
-                        <button class="dropdown-item clear-column-btn delete-btn">Очистить колонку</button>
+                        <button class="dropdown-item sort-btn"><i class="fas fa-sort"></i> Сортировать по приоритету</button>
+                        <button class="dropdown-item clear-column-btn delete-btn"><i class="fas fa-trash"></i> Очистить колонку</button>
                     </div>
                 </div>
             </div>
 
             <button class="add-task-btn">
-                <span class="plus-icon">+</span> Добавить задачу
+                <i class="fas fa-plus"></i> Добавить задачу
             </button>
 
             <div class="task-list"></div>
@@ -78,20 +90,22 @@
             <div class="task-content">Текст задачи</div>
 
             <div class="task-actions">
-                <button class="task-menu-btn">⋮</button>
+                <button class="task-menu-btn" title="Параметры задачи">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
 
                 <div class="task-dropdown hidden">
-                    <button class="dropdown-item priority-btn">Приоритет: Низкий</button>
+                    <button class="dropdown-item priority-btn"><i class="fas fa-flag"></i> Приоритет: Низкий</button>
 
-                    <hr style="margin: 5px 0; border: none; border-top: 1px solid var(--column-border);">
+                    <hr>
                     
-                    <button class="dropdown-item status-btn start-btn">Начать выполнение</button>
-                    <button class="dropdown-item status-btn postpone-btn">Отложить выполнение</button>
-                    <button class="dropdown-item status-btn done-btn">Отметить выполнение</button>
+                    <button class="dropdown-item status-btn start-btn"><i class="fas fa-play"></i> Начать выполнение</button>
+                    <button class="dropdown-item status-btn postpone-btn"><i class="fas fa-pause"></i> Отложить выполнение</button>
+                    <button class="dropdown-item status-btn done-btn"><i class="fas fa-check"></i> Отметить выполнение</button>
                     
-                    <button class="dropdown-item edit-btn">Редактировать</button>
-                    <button class="dropdown-item copy-btn">Копировать</button>
-                    <button class="dropdown-item delete-btn">Удалить</button>
+                    <button class="dropdown-item edit-btn"><i class="fas fa-edit"></i> Редактировать</button>
+                    <button class="dropdown-item copy-btn"><i class="fas fa-copy"></i> Копировать</button>
+                    <button class="dropdown-item delete-btn"><i class="fas fa-trash"></i> Удалить</button>
                 </div>
             </div>
         </div>
