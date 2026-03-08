@@ -73,11 +73,11 @@ body {
     align-items: center;
 }
 
-.task-actions {
+.task-actions, .column-actions {
     position: relative;
 }
 
-.task-dropdown {
+.task-dropdown, .column-dropdown {
     position: absolute;
     top: 100%;
     right: 0;
@@ -92,7 +92,7 @@ body {
     padding: 5px 0;
 }
 
-.task-dropdown.hidden {
+.task-dropdown.hidden, .column-dropdown.hidden {
     display: none;
 }
 

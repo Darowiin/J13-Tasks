@@ -161,7 +161,7 @@ function updateCounters() {
 }
 
 document.addEventListener('click', () => {
-    document.querySelectorAll('.task-dropdown').forEach(menu => {
+    document.querySelectorAll('.task-dropdown, .column-dropdown').forEach(menu => {
         menu.classList.add('hidden');
     });
 });
@@ -233,6 +233,41 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 list.insertBefore(draggingTask, afterElement);
             }
+        });
+    });
+
+    const columnOptionsBtns = document.querySelectorAll('.more-options');
+    
+    columnOptionsBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const dropdown = btn.nextElementSibling;
+            
+            document.querySelectorAll('.column-dropdown, .task-dropdown').forEach(menu => {
+                if (menu !== dropdown) {
+                    menu.classList.add('hidden');
+                }
+            });
+            
+            dropdown.classList.toggle('hidden');
+        });
+    });
+
+    const clearColumnBtns = document.querySelectorAll('.clear-column-btn');
+    
+    clearColumnBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const column = this.closest('.column');
+            const taskList = column.querySelector('.task-list');
+            
+            if (taskList.children.length > 0) {
+                if (confirm(`Точно удалить все задачи из колонки "${column.querySelector('h2').childNodes[0].textContent.trim()}"?`)) {
+                    taskList.innerHTML = '';
+                    updateCounters();
+                }
+            }
+            
+            this.closest('.column-dropdown').classList.add('hidden');
         });
     });
 });
