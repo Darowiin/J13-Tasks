@@ -1,17 +1,89 @@
 let draggingTask = null;
 
-function addTask(columnId, taskText) {
+function updateCounters() {
+    document.querySelectorAll('.column').forEach(column => {
+        const counter = column.querySelector('.counter');
+        const taskCount = column.querySelectorAll('.task').length;
+        counter.textContent = taskCount;
+    });
+}
+
+function sortColumn(column) {
+    const order = column.dataset.sortOrder;
+    if (!order || order === 'none') return;
+
+    const taskList = column.querySelector('.task-list');
+    const tasks = Array.from(taskList.children);
+
+    tasks.sort((a, b) => {
+        const priorityA = a.classList.contains('priority-low') ? 0 : a.classList.contains('priority-medium') ? 1 : 2;
+        const priorityB = b.classList.contains('priority-low') ? 0 : b.classList.contains('priority-medium') ? 1 : 2;
+        
+        return order === 'desc' ? (priorityB - priorityA) : (priorityA - priorityB);
+    });
+
+    tasks.forEach(task => taskList.appendChild(task));
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+document.addEventListener('click', () => {
+    document.querySelectorAll('.task-dropdown, .column-dropdown').forEach(menu => {
+        menu.classList.add('hidden');
+    });
+});
+
+function addTask(columnId, taskText, initialPriorityIndex = 0) {
     const column = document.getElementById(columnId);
     const taskList = column.querySelector('.task-list');
 
+    const taskElement = createTaskElement(taskText, initialPriorityIndex);
+    
+    taskList.appendChild(taskElement);
+    updateCounters();
+    sortColumn(column);
+}
+
+function createTaskElement(taskText, priorityIndex) {
     const template = document.getElementById('task-template');
     const taskElement = template.content.firstElementChild.cloneNode(true); 
     
     const taskContent = taskElement.querySelector('.task-content');
     taskContent.textContent = taskText;
 
+    const priorities = [
+        { class: 'priority-low', text: 'Приоритет: Низкий' },
+        { class: 'priority-medium', text: 'Приоритет: Средний' },
+        { class: 'priority-high', text: 'Приоритет: Высокий' }
+    ];
+
+    taskElement.classList.remove('priority-low');
+    taskElement.classList.add(priorities[priorityIndex].class);
+    taskElement.querySelector('.priority-btn').textContent = priorities[priorityIndex].text;
+
+    bindTaskEvents(taskElement, taskContent, priorities, priorityIndex);
+
+    return taskElement;
+}
+
+function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityIndex) {
     const menuBtn = taskElement.querySelector('.task-menu-btn');
     const dropdown = taskElement.querySelector('.task-dropdown');
+
+    const priorityBtn = taskElement.querySelector('.priority-btn');
     const editBtn = taskElement.querySelector('.edit-btn');
     const copyBtn = taskElement.querySelector('.copy-btn');
     const deleteBtn = taskElement.querySelector('.delete-btn');
@@ -20,40 +92,45 @@ function addTask(columnId, taskText) {
     const postponeBtn = dropdown.querySelector('.postpone-btn');
     const doneBtn = dropdown.querySelector('.done-btn');
 
+    let currentPriorityIndex = initialPriorityIndex;
+
+    priorityBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        taskElement.classList.remove(priorities[currentPriorityIndex].class);
+        currentPriorityIndex = (currentPriorityIndex + 1) % priorities.length;
+        taskElement.classList.add(priorities[currentPriorityIndex].class);
+        priorityBtn.textContent = priorities[currentPriorityIndex].text;
+    });
+
     menuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        
-        document.querySelectorAll('.task-dropdown').forEach(menu => {
-            if (menu !== dropdown) {
-                menu.classList.add('hidden');
-            }
+
+        document.querySelectorAll('.task-dropdown, .column-dropdown').forEach(menu => {
+            if (menu !== dropdown) menu.classList.add('hidden');
         });
-        
+
         dropdown.classList.toggle('hidden');
     });
 
     startBtn.addEventListener('click', () => {
-        const inProgressColumn = document.getElementById('in-progress');
-        inProgressColumn.querySelector('.task-list').appendChild(taskElement);
-
+        document.getElementById('in-progress').querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
         updateCounters();
+        sortColumn(column);
     });
 
     postponeBtn.addEventListener('click', () => {
-        const doColumn = document.getElementById('do');
-        doColumn.querySelector('.task-list').appendChild(taskElement);
-
+        document.getElementById('do').querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
         updateCounters();
+        sortColumn(column);
     });
 
     doneBtn.addEventListener('click', () => {
-        const doneColumn = document.getElementById('done');
-        doneColumn.querySelector('.task-list').appendChild(taskElement);
-
+        document.getElementById('done').querySelector('.task-list').appendChild(taskElement);
         dropdown.classList.add('hidden');
         updateCounters();
+        sortColumn(column);
     });
 
     deleteBtn.addEventListener('click', () => {
@@ -71,8 +148,7 @@ function addTask(columnId, taskText) {
 
     copyBtn.addEventListener('click', () => {
         const currentColumnId = taskElement.closest('.column').id;
-        addTask(currentColumnId, taskContent.textContent + ' (копия)');
-
+        addTask(currentColumnId, taskContent.textContent + ' (копия)', currentPriorityIndex);
         dropdown.classList.add('hidden');
     });
 
@@ -85,6 +161,9 @@ function addTask(columnId, taskText) {
         draggingTask = null;
         taskElement.classList.remove('dragging');
         updateCounters();
+
+        const currentColumn = taskElement.closest('.column');
+        if (currentColumn) sortColumn(currentColumn);
     });
 
     taskContent.addEventListener('dblclick', function() {
@@ -105,7 +184,7 @@ function addTask(columnId, taskText) {
             isEditing = true;
 
             const newText = editInput.value.trim();
-            
+
             if (newText !== '') {
                 this.textContent = newText;
             }
@@ -132,41 +211,9 @@ function addTask(columnId, taskText) {
             }
         });
     });
-
-    taskList.appendChild(taskElement);
-    updateCounters();
 }
 
-function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.task:not(.dragging)')];
-
-    return draggableElements.reduce((closest, child) => {
-        const box = child.getBoundingClientRect();
-        const offset = y - box.top - box.height / 2;
-        
-        if (offset < 0 && offset > closest.offset) {
-            return { offset: offset, element: child };
-        } else {
-            return closest;
-        }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-function updateCounters() {
-    document.querySelectorAll('.column').forEach(column => {
-        const counter = column.querySelector('.counter');
-        const taskCount = column.querySelectorAll('.task').length;
-        counter.textContent = taskCount;
-    });
-}
-
-document.addEventListener('click', () => {
-    document.querySelectorAll('.task-dropdown, .column-dropdown').forEach(menu => {
-        menu.classList.add('hidden');
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function() {
+function initAddButtons() {
     const addTaskButtons = document.querySelectorAll('.add-task-btn');
 
     addTaskButtons.forEach(button => {
@@ -190,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 isFinished = true;
 
                 const taskText = input.value.trim();
-                
+
                 if (taskText !== '') {
                     addTask(column.id, taskText);
                 }
@@ -200,9 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             input.addEventListener('blur', () => {
-                if (!document.hasFocus()) {
-                    return;
-                }
+                if (!document.hasFocus()) return;
                 saveTask();
             });
             
@@ -213,14 +258,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (e.key === 'Escape') {
                     if (isFinished) return;
                     isFinished = true;
-                    
+
                     input.remove();
                     button.style.display = '';
                 }
             });
         });
     });
+}
 
+function initDragAndDropZones() {
     const lists = document.querySelectorAll('.task-list');
 
     lists.forEach(list => {
@@ -235,7 +282,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+}
 
+function initColumnMenus() {
     const columnOptionsBtns = document.querySelectorAll('.more-options');
     
     columnOptionsBtns.forEach(btn => {
@@ -270,4 +319,34 @@ document.addEventListener('DOMContentLoaded', function() {
             this.closest('.column-dropdown').classList.add('hidden');
         });
     });
+}
+
+function initSortButtons() {
+    const sortButtons = document.querySelectorAll('.sort-btn');
+    
+    sortButtons.forEach(btn => {
+        const column = btn.closest('.column');
+        column.dataset.sortOrder = 'none';
+
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+
+            if (column.dataset.sortOrder === 'none' || column.dataset.sortOrder === 'asc') {
+                column.dataset.sortOrder = 'desc';
+                this.textContent = 'Сортировка: сначала неважные';
+            } else {
+                column.dataset.sortOrder = 'asc';
+                this.textContent = 'Сортировка: сначала важные';
+            }
+
+            sortColumn(column);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initAddButtons();
+    initDragAndDropZones();
+    initColumnMenus();
+    initSortButtons();
 });
