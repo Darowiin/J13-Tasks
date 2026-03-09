@@ -44,6 +44,12 @@ body.dark-theme {
     margin: 0 auto;
 }
 
+.task-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .column {
     flex: 1;
     padding: 20px;

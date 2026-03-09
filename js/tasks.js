@@ -40,8 +40,8 @@ function loadFromLocalStorage() {
         
         column.dataset.sortOrder = columnData.sortOrder;
         const sortBtn = column.querySelector('.sort-btn');
-        if (columnData.sortOrder === 'desc') sortBtn.textContent = 'Сортировка: сначала неважные';
-        if (columnData.sortOrder === 'asc') sortBtn.textContent = 'Сортировка: сначала важные';
+        if (columnData.sortOrder === 'desc') sortBtn.innerHTML = '<i class="fas fa-sort-amount-down"></i> Сортировка: сначала неважные';
+        if (columnData.sortOrder === 'asc') sortBtn.innerHTML = '<i class="fas fa-sort-amount-up"></i> Сортировка: сначала важные';
 
         columnData.tasks.forEach(task => {
             addTask(columnId, task.text, task.priorityIndex, false);
@@ -125,7 +125,7 @@ function createTaskElement(taskText, priorityIndex) {
 
     taskElement.classList.remove('priority-low');
     taskElement.classList.add(priorities[priorityIndex].class);
-    taskElement.querySelector('.priority-btn').textContent = priorities[priorityIndex].text;
+    taskElement.querySelector('.priority-btn').innerHTML = `<i class="fas fa-flag"></i> ${priorities[priorityIndex].text}`;
 
     bindTaskEvents(taskElement, taskContent, priorities, priorityIndex);
 
@@ -152,7 +152,7 @@ function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityInd
         taskElement.classList.remove(priorities[currentPriorityIndex].class);
         currentPriorityIndex = (currentPriorityIndex + 1) % priorities.length;
         taskElement.classList.add(priorities[currentPriorityIndex].class);
-        priorityBtn.textContent = priorities[currentPriorityIndex].text;
+        priorityBtn.innerHTML = `<i class="fas fa-flag"></i> ${priorities[currentPriorityIndex].text}`;
 
         sortColumn(taskElement.closest('.column'));
         saveToLocalStorage();
@@ -205,6 +205,7 @@ function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityInd
     taskElement.addEventListener('dragstart', () => {
         draggingTask = taskElement;
         taskElement.classList.add('dragging');
+        dropdown.classList.add('hidden');
     });
 
     taskElement.addEventListener('dragend', () => {
@@ -239,6 +240,7 @@ function bindTaskEvents(taskElement, taskContent, priorities, initialPriorityInd
 
             if (newText !== '') {
                 this.textContent = newText;
+                saveToLocalStorage();
             }
             
             editInput.remove();
@@ -387,10 +389,10 @@ function initSortButtons() {
 
             if (column.dataset.sortOrder === 'none' || column.dataset.sortOrder === 'asc') {
                 column.dataset.sortOrder = 'desc';
-                this.textContent = 'Сортировка: сначала неважные';
+                this.innerHTML = '<i class="fas fa-sort-amount-down"></i> Сортировка: сначала неважные';
             } else {
                 column.dataset.sortOrder = 'asc';
-                this.textContent = 'Сортировка: сначала важные';
+                this.innerHTML = '<i class="fas fa-sort-amount-up"></i> Сортировка: сначала важные';
             }
 
             sortColumn(column);
